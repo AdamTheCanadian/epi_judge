@@ -3,35 +3,33 @@
 #include "test_framework/generic_test.h"
 using std::vector;
 double BuyAndSellStockTwice(const vector<double>& prices) {
-  
-  int sell_index = 0;
+  double max_profit = 0.0;
+  std::vector<double> first_pass(prices.size(), 0);
   double min_price = 1.0e6;
-  double max_profit1 = 0.0;
+
   for (int i = 0; i < prices.size(); i++) {
-    double diff_today = prices[i] - min_price;
-    if (diff_today > max_profit1) {
-      max_profit1 = diff_today;
-      sell_index = i;
-    }
-    // Do we have a new minimum found, if so update
     if (prices[i] < min_price) {
       min_price = prices[i];
     }
-  }
-  min_price = 1.0e6;
-  double max_profit2 = 0.0;
-  for (int i = sell_index; i < prices.size(); i++) {
-    double diff_today = prices[i] - min_price;
-    if (diff_today > max_profit2) {
-      max_profit2 = diff_today;
-      sell_index = i;
+    double price_diff_today = prices[i] - min_price;
+    if (price_diff_today > max_profit) {
+      max_profit = price_diff_today;
     }
-    // Do we have a new minimum found, if so update
-    if (prices[i] < min_price) {
-      min_price = prices[i];
+    // For this day, this is the maximum profit found thus far
+    first_pass[i] = max_profit;
+  }
+
+  double max_price = -1.0e6;
+  for (int i = prices.size() - 1; i > 0; --i) {
+    if (prices[i] > max_price) {
+      max_price = prices[i];
+    }
+    double total_profit_today = max_price - prices[i] + first_pass[i];
+    if (total_profit_today > max_profit) {
+      max_profit = total_profit_today;
     }
   }
-  return max_profit1 + max_profit2;
+  return max_profit;
 }
 
 int main(int argc, char* argv[]) {
