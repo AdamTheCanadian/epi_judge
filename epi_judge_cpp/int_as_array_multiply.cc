@@ -11,17 +11,26 @@ vector<int> Multiply(vector<int> num1, vector<int> num2) {
   else if (num1.front() > 0 && num2.front() < 0) {
     sign = -1;
   }
+  num1.front() = abs(num1.front());
+  num2.front() = abs(num2.front());
   // Initialize the return to all 0's. We may not use all the values
   std::vector<int> result(num1.size() + num2.size(), 0);
-  // TODO - you fill in here.
-  /*
-     
-    123
-  x 456
-    ---
-     18
-
-  */
+  for (int i = num1.size() - 1; i >= 0; i--) {
+    for (int j = num2.size() - 1; j >= 0; j--) {
+      result[i + j + 1] += num1[i] * num2[j];
+      result[i + j] += result[i + j + 1] / 10;
+      result[i + j + 1] %= 10;
+    }
+  }
+  // while(result.front() == 0) {
+  //   result.erase(result.begin() + 0);
+  // }
+  result = {
+    std::find_if_not(std::begin(result), std::end(result), [](int a) {return a == 0;}), std::end(result)};
+  if (result.empty()) {
+    return {0};
+  }
+  result.front() *= sign;
   return result;
 }
 
